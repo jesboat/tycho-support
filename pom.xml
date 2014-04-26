@@ -12,9 +12,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.tesla</groupId>
-    <artifactId>tesla</artifactId>
-    <version>7</version>
+    <groupId>io.takari</groupId>
+    <artifactId>takari</artifactId>
+    <version>9</version>
   </parent>
 
   <groupId>io.tesla.tycho</groupId>
@@ -110,7 +110,17 @@
             <argLine>${tycho.test.jvmArgs}</argLine>
             <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
           </configuration>
-        </plugin>        
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <configuration>
+            <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>               
       </plugins>            
     </pluginManagement>    
   </build>
