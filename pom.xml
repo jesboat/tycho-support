@@ -8,18 +8,19 @@
  ~   http://www.eclipse.org/legal/epl-v10.html
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
-    <version>11</version>
+    <version>12</version>
   </parent>
 
-  <groupId>io.tesla.tycho</groupId>
+  <groupId>io.takari.tycho</groupId>
   <artifactId>tycho-support</artifactId>
-  <version>0.0.14-SNAPSHOT</version>
+  <version>0.14.0-SNAPSHOT</version>
   <name>Tycho Base</name>
   <packaging>pom</packaging>
   <description>
@@ -29,17 +30,26 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <tychoVersion>0.20.0</tychoVersion>
+    <tychoVersion>0.21.0</tychoVersion>
+
+    <!--
+     |
+     | Default m2e core repository location, can be parametrised either from the host project
+     | (if the project depends on specific m2e version) or from command line (to test build
+     | with latest m2e, for example).
+     | 
+     -->
+    <m2e-core.url>http://repository.takari.io:8081/nexus/content/sites/m2e.extras/m2e/1.6.0/N/LATEST</m2e-core.url>
 
     <!--
      |
      | These are the values that can be parameterized to control deploy and release behaviour. By default
-     | we are setup to deploy on the Tesla.io infrastructure.
+     | we are setup to deploy on the takari.io infrastructure.
      |
      -->
     <serverIdInSettingsXml>m2e.extras</serverIdInSettingsXml>
+    <repoHost>http://repository.takari.io:8081</repoHost>
     <repositoryUrl>${repoHost}/nexus/service/local/repositories/m2e.extras/content-compressed/</repositoryUrl>
-    <repositoryPath>${repositoryPathId}/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
 
     <!--
      |
@@ -50,9 +60,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:git@github.com/tesla/tycho-support.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/tesla/tycho-support.git</developerConnection>
-    <url>http://github.com/tesla/tycho-support</url>
+    <connection>scm:git:git@github.com/takari/tycho-support.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/takari/tycho-support.git</developerConnection>
+    <url>http://github.com/takari/tycho-support</url>
   </scm>
 
   <repositories>
@@ -62,8 +72,8 @@
       be able to pick it up.
     -->
     <repository>
-      <id>m2e-tests</id>
-      <url>http://download.eclipse.org/technology/m2e/releases</url>
+      <id>m2e-core</id>
+      <url>${m2e-core.url}</url>
       <layout>p2</layout>
     </repository>
     <repository>
@@ -89,6 +99,7 @@
         <configuration>
           <resolver>p2</resolver>
           <ignoreTychoRepositories>true</ignoreTychoRepositories>
+          <pomDependencies>consider</pomDependencies>
         </configuration>
       </plugin>
     </plugins>
@@ -99,7 +110,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.3</version>
+          <version>2.6</version>
         </plugin>
         <!-- Testing -->
         <plugin>
@@ -120,13 +131,21 @@
             <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-repository-plugin</artifactId>
+          <version>${tychoVersion}</version>
+          <configuration>
+            <compress>false</compress>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
 
   <profiles>
     <profile>
-      <id>deploy</id>
+      <id>deploy-tycho-support</id>
       <activation>
         <file>
           <missing>.tycho-support</missing>
@@ -213,63 +232,20 @@
     
     <!--
      |
-     | Feature build profile will only be activated in the presence of a category.xml file in
+     | Repository build profile will only be activated in the presence of a category.xml file in
      | the base directory of the project.
      |
      -->
     <profile>
-      <id>feature-build</id>
+      <id>repository-build</id>
       <activation>
         <file>
           <exists>category.xml</exists>
         </file>
+        <!-- TODO find a way to activate for eclipse-repository projects only -->
       </activation>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-packaging-plugin</artifactId>
-            <version>${tychoVersion}</version>
-            <configuration>
-              <deployableFeature>true</deployableFeature>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-p2-plugin</artifactId>
-            <version>${tychoVersion}</version>
-            <executions>
-              <execution>
-                <id>categorization</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>category-p2-metadata</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <metadataRepositoryName>${p2MetadataName}</metadataRepositoryName>
-              <artifactRepositoryName>${p2MetadataName}</artifactRepositoryName>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>io.tesla.tycho</groupId>
-            <artifactId>feature-zip-plugin</artifactId>
-            <version>0.0.1</version>
-            <configuration>
-              <sourceDirectory>${project.build.directory}/site</sourceDirectory>
-              <zip>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</zip>
-            </configuration>
-            <executions>
-              <execution>
-                <id>feature-zip</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>zip</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
           <!--
            |
            | Only deploy the update site zip to the server using the maven-upload-plugin.
@@ -279,6 +255,11 @@
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>maven-upload-plugin</artifactId>
             <version>0.0.1</version>
+            <configuration>
+              <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
+              <serverId>${serverIdInSettingsXml}</serverId>
+              <repositoryUrl>${repositoryUrl}</repositoryUrl>
+            </configuration>
             <executions>
               <execution>
                 <id>publish-site</id>
@@ -287,90 +268,17 @@
                   <goal>upload-file</goal>
                 </goals>
                 <configuration>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
-                  <serverId>${serverIdInSettingsXml}</serverId>
-                  <repositoryUrl>${repositoryUrl}</repositoryUrl>
-                  <repositoryPath>${repositoryPath}</repositoryPath>
+                  <repositoryPath>${repositoryPathId}/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>
                 </configuration>
               </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>    
-    
-    <!--
-     |
-     | Site build profile will only be activated in the presence of a site.xml file in
-     | the base directory of the project.
-     |
-     -->
-    <profile>
-      <id>site-build</id>
-      <activation>
-        <file>
-          <exists>site.xml</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-packaging-plugin</artifactId>
-            <version>${tychoVersion}</version>
-            <executions>
               <execution>
-                <id>build-qualifier</id>
-                <goals>
-                  <goal>build-qualifier</goal>
-                </goals>
-                <phase>validate</phase>
-              </execution>
-            </executions>
-            <configuration>
-              <metadataRepositoryName>${p2MetadataName}</metadataRepositoryName>
-              <artifactRepositoryName>${p2MetadataName}</artifactRepositoryName>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>io.tesla.tycho</groupId>
-            <artifactId>feature-zip-plugin</artifactId>
-            <version>0.0.1</version>
-            <configuration>
-              <sourceDirectory>${project.build.directory}/site</sourceDirectory>
-              <zip>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</zip>
-            </configuration>
-            <executions>
-              <execution>
-                <id>feature-zip</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>zip</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <!--
-           |
-           | Only deploy the update site zip to the server using the maven-upload-plugin.
-           |
-           -->
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>maven-upload-plugin</artifactId>
-            <version>0.0.1</version>
-            <executions>
-              <execution>
-                <id>publish-site</id>
+                <id>publish-site-latest</id>
                 <phase>deploy</phase>
                 <goals>
                   <goal>upload-file</goal>
                 </goals>
                 <configuration>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
-                  <serverId>${serverIdInSettingsXml}</serverId>
-                  <repositoryUrl>${repositoryUrl}</repositoryUrl>
-                  <repositoryPath>${repositoryPath}</repositoryPath>
+                  <repositoryPath>${repositoryPathId}/${unqualifiedVersion}/N/LATEST</repositoryPath>
                 </configuration>
               </execution>
             </executions>
