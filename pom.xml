@@ -14,7 +14,7 @@
   <parent>
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
-    <version>12</version>
+    <version>13</version>
   </parent>
 
   <groupId>io.takari.tycho</groupId>
@@ -38,7 +38,7 @@
      | with latest m2e, for example).
      | 
      -->
-    <m2e-core.url>http://repository.takari.io:8081/nexus/content/sites/m2e.extras/m2e/1.6.0/N/LATEST</m2e-core.url>
+    <m2e-core.url>${repoHost}/content/sites/m2e.extras/m2e/1.6.0/N/LATEST</m2e-core.url>
 
     <!--
      |
@@ -47,8 +47,7 @@
      |
      -->
     <serverIdInSettingsXml>m2e.extras</serverIdInSettingsXml>
-    <repoHost>http://repository.takari.io:8081</repoHost>
-    <repositoryUrl>${repoHost}/nexus/service/local/repositories/m2e.extras/content-compressed/</repositoryUrl>
+    <repositoryUrl>${repoHost}/service/local/repositories/m2e.extras/content-compressed/</repositoryUrl>
 
     <!--
      |
