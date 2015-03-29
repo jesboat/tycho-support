@@ -14,12 +14,12 @@
   <parent>
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
-    <version>13</version>
+    <version>14</version>
   </parent>
 
   <groupId>io.takari.tycho</groupId>
   <artifactId>tycho-support</artifactId>
-  <version>0.15.0-SNAPSHOT</version>
+  <version>0.16.0-SNAPSHOT</version>
   <name>Tycho Base</name>
   <packaging>pom</packaging>
   <description>
@@ -61,7 +61,6 @@
     <connection>scm:git:git@github.com/takari/tycho-support.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/takari/tycho-support.git</developerConnection>
     <url>http://github.com/takari/tycho-support</url>
-    <tag>HEAD</tag>
   </scm>
 
   <repositories>
