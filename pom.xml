@@ -29,7 +29,14 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <tychoVersion>0.21.0</tychoVersion>
+    <tychoVersion>0.25.0</tychoVersion>
+
+    <!--
+     | Default eclipse simultaneous release repository location, can be parametrised either 
+     | from the host project (if the project depends on specific eclipse version) or from 
+     | command line (to test build with latest eclipse, for example).
+     -->
+    <eclipse-repo.url>http://download.eclipse.org/releases/mars</eclipse-repo.url>
 
     <!--
      |
@@ -76,8 +83,8 @@
       <layout>p2</layout>
     </repository>
     <repository>
-      <id>luna</id>
-      <url>http://download.eclipse.org/releases/luna</url>
+      <id>eclipse</id>
+      <url>${eclipse-repo.url}</url>
       <layout>p2</layout>
     </repository>
   </repositories>
